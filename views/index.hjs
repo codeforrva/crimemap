@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ title }}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css'>
+    <script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.4/mapbox.css' rel='stylesheet'>
+  </head>
+  <body>
+    <div id="map">
+      <img class="logo" src="images/logo.jpg">
+    </div>
+    <h1>{{ title }}</h1>
+    <p>Welcome to {{ title }}</p>
+    <script>
+    // Provide your access token
+    L.mapbox.accessToken = 'pk.eyJ1Ijoiam9leWZpZ2FybyIsImEiOiJoelEwUS1ZIn0.A-DeRFvp3ca1bC-LZBPRVw';
+    // Create a map in the div #map
+    L.mapbox.map('map', 'joeyfigaro.j48h9i8a').setView([37.540725, -77.436048], 13);
+    </script>
+  </body>
+</html>
