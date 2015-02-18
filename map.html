@@ -82,7 +82,16 @@
                     doc._source.geoip.location.lat,
                     doc._source.geoip.location.lon),
                 map: window.map,
-                title: doc._source.offenseCodeDesc
+                title: doc._source.offenseCodeDesc,
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 6,
+                  fillColor: getColorString(doc._source.offenseCodeDesc),
+                  fillOpacity: 0.9,
+                  strokeColor: getColorString(doc._source.offenseCodeDesc, true),
+                  strokeOpacity: 0.6,
+                  strokeWeight: 1
+                }
               });
 
               google.maps.event.addListener(marker, 'click', function() {
@@ -108,6 +117,21 @@
         window.infoWindowTemplate = Handlebars.compile($('#infoWindowTemplate').html());
       });
 
+      function getColorString(str, stroke) {
+        // hash code for strings, used to generate color codes
+        // http://erlycoder.com/49/javascript-hash-functions-to-convert-string-into-integer-hash-
+        var hash = 5381;
+        for (i = 0; i < str.length; i++) {
+            char = str.charCodeAt(i);
+            hash = ((hash << 5) + hash) + char; /* hash * 33 + c */
+        }
+
+        var h = hash % 360;
+        var s = Math.abs((hash >> 8) % 50);
+        var l = Math.abs((hash >> 4) % 50);
+
+        return 'hsl(' + h + ', ' + (s+50) + '%, ' + (l+(stroke?0:25)) + '%)';
+      }
 
     </script>
   </head>
