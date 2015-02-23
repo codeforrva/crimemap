@@ -21,91 +21,62 @@
 
         // get some points once the map is idle
         google.maps.event.addListenerOnce(window.map, 'idle', function() {
-          //var ne = window.map.getBounds().getNorthEast();
-          //var sw = window.map.getBounds().getSouthWest();
 
-          //$.post("/logstash-*/logs/_search", JSON.stringify({
-          $.post("http://mogrify.us.to:9203/_search", JSON.stringify({
-            "query": {
-              "filtered": {
-                "filter": {
-                  "and": [
-                    // require geocoded
-                    { "term": { "tags": "geocoded" } },
-                    // date range - greater than now minus six months
-                    { "range": { "@timestamp": { "gt": "now-6M" } } }
-                  ]
-                  
-                  // this filter would limit points to a bounding box area
-                  /* 
-                  "geo_bounding_box": {
-                    "geoip.location": {
-                      "top_right": {
-                        "lat": ne.lat(),
-                        "lon": ne.lng()
-                      },
-                      "bottom_left": {
-                        "lat": sw.lat(),
-                        "lon": sw.lng()
-                      }
-                    }
+          $.getJSON("https://brigades.opendatanetwork.com/resource/ush7-in5v.json?$$app_token=3sg2sPslVNC65HpUxDTSfRR4d" +
+              "&$limit=500" +
+              "&$select=incident_location,offense_code_desc,incident_date_time,disposition_code_desc")
+            .done(function(data) {
+
+              // this does a heatmap layer. more points is better. only need incident_location in $select
+              /*
+              var points = data.map(function(row) {
+                return new google.maps.LatLng(
+                  row.incident_location.latitude,
+                  row.incident_location.longitude);
+              });
+
+              var heatmap = new google.maps.visualization.HeatmapLayer({
+                data: new google.maps.MVCArray(points)
+              });
+              heatmap.setMap(window.map);
+              */
+
+              data.map(function(row) {
+                // TODO: would be better to filter these out in the query. not sure what the syntax is.
+                if (!row.incident_location.latitude || !row.incident_location.longitude)
+                  return;
+
+                var marker = new google.maps.Marker({
+                  position: new google.maps.LatLng(
+                      row.incident_location.latitude,
+                      row.incident_location.longitude),
+                  map: window.map,
+                  title: row.offense_code_desc,
+                  icon: {
+                    path: google.maps.SymbolPath.CIRCLE,
+                    scale: 6,
+                    fillColor: getColorString(row.offense_code_desc),
+                    fillOpacity: 0.9,
+                    strokeColor: getColorString(row.offense_code_desc, true),
+                    strokeOpacity: 0.6,
+                    strokeWeight: 1
                   }
-                  */
-                }
-              }
-            },
-            "from": 0,
-            "size": 500, // max number of points to get
-            "_source": ["geoip", "offenseCodeDesc", "@timestamp", "dispositionCodeDesc"]
-          }), function(data) {
-            
-            // this does a heatmap layer. more points is better. only need geoip in _source
-            /*
-            var points = data.hits.hits.map(function(doc) {
-              return new google.maps.LatLng(
-                doc._source.geoip.location.lat,
-                doc._source.geoip.location.lon);
-            });
-
-            var heatmap = new google.maps.visualization.HeatmapLayer({
-              data: new google.maps.MVCArray(points)
-            });
-            heatmap.setMap(window.map);
-            */
-
-            // this adds points as markers with info windows
-            data.hits.hits.map(function(doc) {
-              doc._source.timestamp = doc._source["@timestamp"];
-
-              var marker = new google.maps.Marker({
-                position: new google.maps.LatLng(
-                    doc._source.geoip.location.lat,
-                    doc._source.geoip.location.lon),
-                map: window.map,
-                title: doc._source.offenseCodeDesc,
-                icon: {
-                  path: google.maps.SymbolPath.CIRCLE,
-                  scale: 6,
-                  fillColor: getColorString(doc._source.offenseCodeDesc),
-                  fillOpacity: 0.9,
-                  strokeColor: getColorString(doc._source.offenseCodeDesc, true),
-                  strokeOpacity: 0.6,
-                  strokeWeight: 1
-                }
-              });
-
-              google.maps.event.addListener(marker, 'click', function() {
-                if (window.infoWindow) {
-                  window.infoWindow.close();
-                }
-                window.infoWindow = new google.maps.InfoWindow({
-                  content: window.infoWindowTemplate(doc._source)
                 });
-                window.infoWindow.open(marker.map, marker);
-              });
-            });
 
-          }, 'json');
+                google.maps.event.addListener(marker, 'click', function() {
+                  if (window.infoWindow) {
+                    window.infoWindow.close();
+                  }
+                  window.infoWindow = new google.maps.InfoWindow({
+                    content: window.infoWindowTemplate(row)
+                  });
+                  window.infoWindow.open(marker.map, marker);
+                });
+              });
+            })
+            .fail(function(obj) {
+              console.error("Request failed", obj);
+            });
         });
       }
       google.maps.event.addDomListener(window, 'load', mapsInit);
@@ -141,9 +112,9 @@
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js"></script>
   <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
   <script id="infoWindowTemplate" type="text/x-handlebars-template">
-    <h3>{{offenseCodeDesc}}</h3>
-    <p>{{date timestamp}}</p>
-    <p>{{dispositionCodeDesc}}</p>
+    <h3>{{offense_code_desc}}</h3>
+    <p>{{date incident_date_time}}</p>
+    <p>{{disposition_code_desc}}</p>
   </script>
   </body>
 </html>
