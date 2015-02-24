@@ -46,6 +46,8 @@
                 if (!row.incident_location.latitude || !row.incident_location.longitude)
                   return;
 
+                row.incident_address = JSON.parse(row.incident_location.human_address).address;
+
                 var marker = new google.maps.Marker({
                   position: new google.maps.LatLng(
                       row.incident_location.latitude,
@@ -71,11 +73,13 @@
                     content: window.infoWindowTemplate(row)
                   });
                   window.infoWindow.open(marker.map, marker);
+                  window.console && console.log(row);
                 });
               });
+
             })
             .fail(function(obj) {
-              console.error("Request failed", obj);
+              window.console && console.error("Request failed", obj);
             });
         });
       }
@@ -115,6 +119,8 @@
     <h3>{{offense_code_desc}}</h3>
     <p>{{date incident_date_time}}</p>
     <p>{{disposition_code_desc}}</p>
+    <p>{{incident_address}}</p>
+    <p>({{incident_location.latitude}}, {{incident_location.longitude}})</p>
   </script>
   </body>
 </html>
