@@ -41,7 +41,7 @@
                     <input id="endDate" type="date" value="2015-01-31" class="form-control">
                   </div>
                   <span id="numMarkers"></span>
-                  <button id="updateDate" type="button" class="btn pull-right">Update</button>
+                  <button id="updateDate" type="button" class="btn pull-right btn-primary">Update</button>
                 </form>
               </div>
             </div>
@@ -56,17 +56,27 @@
             </div>
             <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
               <div class="panel-body">
-                <div class="button-group" data-toggle="buttons-radio">
-                  <button id="showMarkers" type="button" class="btn">Markers</button>
-                  <button id="showHeatmap" type="button" class="btn">Heatmap</button>
-                </div>
+                <form>
+                  <div class="form-group">
+                    <label>
+                      <input id="showMarkers" type="radio" name="viewType">
+                      Marker
+                    </label>
+                  </div>
+                  <div class="form-group">
+                    <label>
+                      <input id="showHeatmap" type="radio" name="viewType">
+                      Heatmap
+                    </label>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
         </div>
         <div id="loading" style="display:none;">Loading...</div>
       </div>
-      <div id="map-canvas" class="col-sm-9 col-sm-pull-3 col-xs-12">map</div>
+      <div id="map-canvas" class="col-sm-9 col-sm-pull-3 col-xs-12"></div>
     </div>
     <div id="alert-container"></div>
 
