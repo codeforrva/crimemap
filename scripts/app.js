@@ -126,35 +126,7 @@ function loadHeatmap(map) {
     //,    "$order": "incident_date_time DESC"
   })
   .done(function(data) {
-
-    // this does a heatmap layer. more points is better. only need incident_location in $select
-    var points = data.filter(function(row) {
-      return (
-        // filter out rows with no coordinates
-        row.incident_location.latitude && row.incident_location.longitude &&
-        // TODO: these specific sites might be filterable in the API
-        // e.g. incident_location.longitude != ...
-        // filter out city hall
-        (row.incident_location.longitude != "-77.43364758299998" &&
-        row.incident_location.latitude != "37.54070234900007") &&
-        // filter out police HQ
-        (row.incident_location.longitude != "-77.44491629499998" &&
-        row.incident_location.latitude != "37.546095328000035") &&
-        // TODO: see if there are other police stations, courthouses, etc.
-        // the very common 1300 Coalter Street address may be the sheriff's office, not sure
-        true);
-    }).map(function(row) {
-      // TODO: WeightedLocation for more serious incidents?
-      return new google.maps.LatLng(
-        row.incident_location.latitude,
-        row.incident_location.longitude);
-    });
-    console.log("Creating heatmap with", points.length, "points");
-
-    window.heatmap = new google.maps.visualization.HeatmapLayer({
-      data: new google.maps.MVCArray(points),
-      radius: 15
-    });
+    window.heatmap = getHeatmapLayer(data);
     showHeatmap(map);
   });
 }
@@ -212,4 +184,75 @@ function showAlert(message, cls) {
     .appendTo($('#alert-container'))
     .slideDown('fast');
   setTimeout(function(){$d.slideUp('fast', function(){$(this).remove();});}, 10000);
+}
+
+function animateHeatmap(map) {
+  // this doesn't work very well, the CPU and memory usage grows as the layers
+  // are swapped out, and then it eventually stops entirely
+  var layers = {};
+  var startYear = 2004, endYear = 2014;
+
+  var fetch = function(innerYear) {
+    return apiQuery({
+      "$limit": 50000,
+      "$select": "incident_location",
+      "$where": "incident_date_time >= '" + innerYear + "-01-01T00:00:00' and incident_date_time <= '" + innerYear + "-12-31T23:59:59'"
+    });
+  };
+
+  var showHeatmapFrame = function(year) {
+    console.log('displaying ', year);
+    for (var i in layers) {
+      layers[i].setMap((i == year) ? map : null);
+    }
+    $('#info').show().text(year);
+  }
+
+  var chain = $.when({});
+  for (var year = startYear; year <= endYear; year++) {
+    (function(innerYear) {
+      chain = chain.then(function() {
+        return fetch(innerYear).done(function(data){
+          layers[innerYear] = getHeatmapLayer(data);
+        });
+      });
+    })(year);
+  }
+  chain.then(function() {
+    var currentYear = startYear;
+    var interval = window.setInterval(function() {
+      showHeatmapFrame(currentYear);
+      currentYear++;
+      if (currentYear > endYear)
+        currentYear = startYear;
+    }, 2500);
+  });
+}
+
+function getHeatmapLayer(data) {
+  var points = data.filter(function(row) {
+    return (
+      // filter out rows with no coordinates
+      row.incident_location.latitude && row.incident_location.longitude &&
+      // TODO: these specific sites might be filterable in the API
+      // e.g. incident_location.longitude != ...
+      // filter out city hall
+      (row.incident_location.longitude != "-77.43364758299998" &&
+      row.incident_location.latitude != "37.54070234900007") &&
+      // filter out police HQ
+      (row.incident_location.longitude != "-77.44491629499998" &&
+      row.incident_location.latitude != "37.546095328000035") &&
+      // TODO: see if there are other police stations, courthouses, etc.
+      // the very common 1300 Coalter Street address may be the sheriff's office, not sure
+      true);
+  }).map(function(row) {
+    // TODO: WeightedLocation for more serious incidents?
+    return new google.maps.LatLng(
+      row.incident_location.latitude,
+      row.incident_location.longitude);
+  });
+  return new google.maps.visualization.HeatmapLayer({
+        data: new google.maps.MVCArray(points),
+        radius: 15
+      });
 }
