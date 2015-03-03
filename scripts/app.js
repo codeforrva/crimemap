@@ -15,7 +15,7 @@ $(function() {
   Handlebars.registerHelper('date', function(context) {
     return moment(new Date(context)).format("MMMM D, YYYY [at] h:mm a");
   });
-  
+
   window.infoWindowTemplate = Handlebars.compile($('#infoWindowTemplate').html());
 
   // date picker update
