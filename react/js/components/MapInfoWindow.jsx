@@ -8,7 +8,7 @@ var MapInfoWindow = React.createClass({
     return (
       <div>
         <h4>{this.props.incident.offense_code_desc}</h4>
-        <p>{this.props.incident.incident_date_time}</p>
+        <p>{moment(this.props.incident.incident_date_time).format("MMMM D, YYYY h:mm a")}</p>
         <p>{this.props.incident.disposition_code_desc}</p>
         <p>{this.props.incident.incident_address}</p>
         <p>({this.props.incident.incident_location.latitude}, {this.props.incident.incident_location.longitude})</p>
