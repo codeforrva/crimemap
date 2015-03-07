@@ -11,7 +11,8 @@ var App = React.createClass({
     return {
       startDate: "2015-01-01",
       endDate: "2015-01-31",
-      incidentFetchTime: new Date()
+      incidentFetchTime: new Date(),
+      viewType: 'markers'
     }
   },
 
@@ -28,15 +29,21 @@ var App = React.createClass({
     }.bind(this));
   },
 
+  viewTypeChanged: function(choice) {
+    this.setState({ viewType: choice });
+  },
+
   render: function() {
     return (
       <div id="container" className="container-fluid pull-right">
         <ControlPanel
           startDate={this.state.startDate}
           endDate={this.state.endDate}
+          viewType={this.state.viewType}
           onDateRangeChanged={this.dateRangeChanged}
-          onDateRangeUpdate={this.dateRangeUpdate}/>
-        <Map incidents={this.state.incidents} incidentFetchTime={this.state.incidentFetchTime}/>
+          onDateRangeUpdate={this.dateRangeUpdate}
+          onViewTypeChanged={this.viewTypeChanged}/>
+        <Map viewType={this.state.viewType} incidents={this.state.incidents} incidentFetchTime={this.state.incidentFetchTime}/>
         <AlertBox />
       </div>
     );

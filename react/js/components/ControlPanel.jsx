@@ -6,8 +6,10 @@ var ControlPanel = React.createClass({
   propTypes: {
     startDate: React.PropTypes.string.isRequired,
     endDate: React.PropTypes.string.isRequired,
+    viewType: React.PropTypes.string.isRequired,
     onDateRangeChanged: React.PropTypes.func,
-    onDateRangeUpdate: React.PropTypes.func
+    onDateRangeUpdate: React.PropTypes.func,
+    onViewTypeChanged: React.PropTypes.func
   },
   dateRangeChanged: function(e) {
     if (this.props.onDateRangeChanged) {
@@ -19,6 +21,9 @@ var ControlPanel = React.createClass({
   },
   dateRangeUpdate: function(e) {
     if (this.props.onDateRangeUpdate) { this.props.onDateRangeUpdate(); }
+  },
+  viewTypeChanged: function(choice, e) {
+    if (this.props.onViewTypeChanged) { this.props.onViewTypeChanged(choice); }
   },
   render: function() {
     return (
@@ -44,13 +49,15 @@ var ControlPanel = React.createClass({
             <form>
               <div className="form-group">
                 <label>
-                  <input id="showMarkers" type="radio" name="viewType"/>
-                  Marker
+                  <input id="showMarkers" type="radio" name="viewType" onChange={this.viewTypeChanged.bind(this, 'markers')}
+                    checked={this.props.viewType == 'markers' ? 'checked' : ''}/>&nbsp;
+                  Markers
                 </label>
               </div>
               <div className="form-group">
                 <label>
-                  <input id="showHeatmap" type="radio" name="viewType"/>
+                  <input id="showHeatmap" type="radio" name="viewType" onChange={this.viewTypeChanged.bind(this, 'heatmap')}
+                  checked={this.props.viewType == 'heatmap' ? 'checked' : ''}/>&nbsp;
                   Heatmap
                 </label>
               </div>

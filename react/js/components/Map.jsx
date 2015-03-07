@@ -3,6 +3,7 @@
 var MapInfoWindow = require('./MapInfoWindow');
 
 var Map = React.createClass({
+  // component lifecycle functions
   getInitialState: function() {
     return {
       incidentFetchTime: this.props.incidentFetchTime
@@ -21,48 +22,62 @@ var Map = React.createClass({
   },
   componentWillReceiveProps: function(nextProps) {
     if (this.shouldComponentUpdate(nextProps)) {
-      // clear existing markers
-      if (this.state.markers) {
-        this.state.markers.map(function(m){m.setMap(null);});
-      }
-      // generate new markers
-      var markers = nextProps.incidents.map(function(row) {
-        var marker = new google.maps.Marker({
-          position: new google.maps.LatLng(
-              row.incident_location.latitude,
-              row.incident_location.longitude),
-          title: row.offense_code_desc,
-          icon: getIcon(row.offense_code_desc)
-        });
+      if (nextProps.viewType == 'markers') {
+        // clear existing markers
+        if (this.state.markers) {
+          this.state.markers.map(function(m){m.setMap(null);});
+        }
+        // generate new markers
+        var markers = nextProps.incidents.map(function(row) {
+          var marker = new google.maps.Marker({
+            position: new google.maps.LatLng(
+                row.incident_location.latitude,
+                row.incident_location.longitude),
+            title: row.offense_code_desc,
+            icon: getIcon(row.offense_code_desc)
+          });
 
-        google.maps.event.addListener(marker, 'click', function() {
-          this.state.infoWindow.close();
-          this.state.infoWindow.setContent(React.renderToStaticMarkup(<MapInfoWindow incident={row}/>));
-          this.state.infoWindow.open(this.state.map, marker);
+          google.maps.event.addListener(marker, 'click', function() {
+            this.state.infoWindow.close();
+            this.state.infoWindow.setContent(React.renderToStaticMarkup(<MapInfoWindow incident={row}/>));
+            this.state.infoWindow.open(this.state.map, marker);
+          }.bind(this));
+
+          return marker;
+
         }.bind(this));
 
-        return marker;
-
-      }.bind(this));
-
-      // add new markers to the state along with the fetch time so we can check if we need to update
-      this.setState({ markers: markers, incidentFetchTime: nextProps.incidentFetchTime });
+        // add new markers to the state along with the fetch time so we can check if we need to update
+        this.setState({ markers: markers, incidentFetchTime: nextProps.incidentFetchTime });
+      } else {
+        // TODO: load heatmap
+      }
     }
   },
   shouldComponentUpdate: function(nextProps) {
     // do not update unless the incidents have been fetched more recently than the ones we have
-    return !!nextProps.incidents && nextProps.incidentFetchTime > this.state.incidentFetchTime;
+    // or if we are changing view type
+    return (!!nextProps.incidents && nextProps.incidentFetchTime > this.state.incidentFetchTime) || this.props.viewType != nextProps.viewType;
   },
   render: function() {
-    // add markers to map
-    if (this.state && this.state.markers) {
-      for (var i in this.state.markers) {
-        this.state.markers[i].setMap(this.state.map);
-      }
+    if (this.props.viewType == 'markers') {
+      this.setMarkerMap(this.state.map);
+      // TODO: hide heatmap
+    } else if (this.props.viewType == 'heatmap') {
+      this.setMarkerMap(null);
+      // TODO: show heatmap
     }
     return (
       <div id="map-canvas" className="col-sm-9 col-sm-pull-3 col-xs-12"/>
     );
+  },
+  // other functions
+  setMarkerMap: function(obj) {
+    if (this.state && this.state.markers) {
+      for (var i in this.state.markers) {
+        this.state.markers[i].setMap(obj);
+      }
+    }
   }
 });
 
