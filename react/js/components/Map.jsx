@@ -6,7 +6,8 @@ var Map = React.createClass({
   // component lifecycle functions
   getInitialState: function() {
     return {
-      incidentFetchTime: this.props.incidentFetchTime
+      markerGenTime: this.props.incidentFetchTime,
+      heatmapGenTime: this.props.incidentFetchTime
     }
   },
   componentDidMount: function(el) {
@@ -21,51 +22,59 @@ var Map = React.createClass({
     });
   },
   componentWillReceiveProps: function(nextProps) {
-    if (this.shouldComponentUpdate(nextProps)) {
-      if (nextProps.viewType == 'markers') {
-        // clear existing markers
-        if (this.state.markers) {
-          this.state.markers.map(function(m){m.setMap(null);});
-        }
-        // generate new markers
-        var markers = nextProps.incidents.map(function(row) {
-          var marker = new google.maps.Marker({
-            position: new google.maps.LatLng(
-                row.incident_location.latitude,
-                row.incident_location.longitude),
-            title: row.offense_code_desc,
-            icon: getIcon(row.offense_code_desc)
-          });
+    // here we generate the Google Maps stuff based on the data
+    if (this.shouldGenMarkers(nextProps)) {
+      // clear existing markers
+      this.setMarkerMap(null);
+      // generate new markers
+      var markers = nextProps.incidents.map(function(row) {
+        var marker = new google.maps.Marker({
+          position: new google.maps.LatLng(
+              row.incident_location.latitude,
+              row.incident_location.longitude),
+          title: row.offense_code_desc,
+          icon: getIcon(row.offense_code_desc)
+        });
 
-          google.maps.event.addListener(marker, 'click', function() {
-            this.state.infoWindow.close();
-            this.state.infoWindow.setContent(React.renderToStaticMarkup(<MapInfoWindow incident={row}/>));
-            this.state.infoWindow.open(this.state.map, marker);
-          }.bind(this));
-
-          return marker;
-
+        google.maps.event.addListener(marker, 'click', function() {
+          this.state.infoWindow.close();
+          this.state.infoWindow.setContent(React.renderToStaticMarkup(<MapInfoWindow incident={row}/>));
+          this.state.infoWindow.open(this.state.map, marker);
         }.bind(this));
 
-        // add new markers to the state along with the fetch time so we can check if we need to update
-        this.setState({ markers: markers, incidentFetchTime: nextProps.incidentFetchTime });
-      } else {
-        // TODO: load heatmap
-      }
+        return marker;
+
+      }.bind(this));
+
+      // add new markers to the state along with the fetch time so we can check if we need to update
+      this.setState({ markers: markers, markerGenTime: nextProps.incidentFetchTime });
+    } else if (this.shouldGenHeatmap(nextProps)) {
+      // clear existing heatmap
+      this.setHeatmapMap(null);
+      var points = nextProps.heatmapPoints.map(function(row) {
+        // TODO: WeightedLocation for more serious incidents?
+        return new google.maps.LatLng(
+          row.incident_location.latitude,
+          row.incident_location.longitude);
+      });
+      var heatmapLayer = new google.maps.visualization.HeatmapLayer({
+            data: new google.maps.MVCArray(points),
+            radius: 15
+          });
+      this.setState({ heatmapLayer: heatmapLayer, heatmapGenTime: nextProps.incidentFetchTime });
     }
   },
   shouldComponentUpdate: function(nextProps) {
-    // do not update unless the incidents have been fetched more recently than the ones we have
-    // or if we are changing view type
-    return (!!nextProps.incidents && nextProps.incidentFetchTime > this.state.incidentFetchTime) || this.props.viewType != nextProps.viewType;
+    return this.shouldGenMarkers(nextProps) || this.shouldGenHeatmap(nextProps) ||
+      this.props.viewType != nextProps.viewType;
   },
   render: function() {
     if (this.props.viewType == 'markers') {
       this.setMarkerMap(this.state.map);
-      // TODO: hide heatmap
+      this.setHeatmapMap(null);
     } else if (this.props.viewType == 'heatmap') {
       this.setMarkerMap(null);
-      // TODO: show heatmap
+      this.setHeatmapMap(this.state.map);
     }
     return (
       <div id="map-canvas" className="col-sm-9 col-sm-pull-3 col-xs-12"/>
@@ -78,6 +87,21 @@ var Map = React.createClass({
         this.state.markers[i].setMap(obj);
       }
     }
+  },
+  setHeatmapMap: function(obj) {
+    if (this.state && this.state.heatmapLayer) {
+      this.state.heatmapLayer.setMap(obj);
+    }
+  },
+  shouldGenMarkers: function(nextProps) {
+    return nextProps.viewType == 'markers' &&
+      !!nextProps.incidents &&
+      nextProps.incidentFetchTime > this.state.markerGenTime;
+  },
+  shouldGenHeatmap: function(nextProps) {
+    return nextProps.viewType == 'heatmap' &&
+      !!nextProps.heatmapPoints &&
+      nextProps.incidentFetchTime > this.state.heatmapGenTime;
   }
 });
 

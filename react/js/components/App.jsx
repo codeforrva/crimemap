@@ -21,11 +21,19 @@ var App = React.createClass({
   },
 
   dateRangeUpdate: function() {
-    IncidentDataStore.queryIncidents({
-      startDate: this.state.startDate,
-      endDate: this.state.endDate
-    }).done(function(data) {
-      this.setState({ incidents: data, incidentFetchTime: new Date() })
+    $.when(
+      // markers
+      IncidentDataStore.queryIncidents({
+        startDate: this.state.startDate,
+        endDate: this.state.endDate
+      }),
+      // heatmap
+      IncidentDataStore.queryHeatmap({
+        startDate: this.state.startDate,
+        endDate: this.state.endDate
+      })
+    ).done(function(markerData, heatmapData) {
+      this.setState({ incidents: markerData, heatmapPoints: heatmapData, incidentFetchTime: new Date() })
     }.bind(this));
   },
 
@@ -43,7 +51,10 @@ var App = React.createClass({
           onDateRangeChanged={this.dateRangeChanged}
           onDateRangeUpdate={this.dateRangeUpdate}
           onViewTypeChanged={this.viewTypeChanged}/>
-        <Map viewType={this.state.viewType} incidents={this.state.incidents} incidentFetchTime={this.state.incidentFetchTime}/>
+        <Map viewType={this.state.viewType}
+          incidents={this.state.incidents}
+          heatmapPoints={this.state.heatmapPoints}
+          incidentFetchTime={this.state.incidentFetchTime}/>
         <AlertBox />
       </div>
     );

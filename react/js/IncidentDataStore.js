@@ -10,17 +10,25 @@ var IncidentDataStore = (function() {
       }).always(loading.slideUp('fast'))*/;
   };
 
+  var Fields = {
+    INCIDENT_BASIC_INFO: "incident_location,offense_code_desc,incident_date_time,disposition_code_desc",
+    INCIDENT_LOCATION: "incident_location"
+  }
+
   var queryIncidents = function(options) {
 
-    var startDate = options.startDate;
-    var endDate = options.endDate;
+    var startDate = options.startDate || '2015-01-01';
+    var endDate = options.endDate || '2015-01-31';
+    var fields = options.fields || Fields.INCIDENT_BASIC_INFO;
+    var limit = parseInt(options.limit) || 1000;
 
     var deferred = $.Deferred();
 
     apiQuery({
-      "$select": "incident_location,offense_code_desc,incident_date_time,disposition_code_desc",
+      "$select": fields,
       // TODO: there is a time zone thing going on here
-      "$where": "incident_date_time >= '" + startDate + "T00:00:00' and incident_date_time <= '" + endDate + "T23:59:59'"
+      "$where": "incident_date_time >= '" + startDate + "T00:00:00' and incident_date_time <= '" + endDate + "T23:59:59'",
+      "$limit": limit
     }).done(function(data) {
       var incidents = data.filter(function(row) {
         // TODO: would be better to filter these out in the query. not sure what the syntax is.
@@ -35,8 +43,35 @@ var IncidentDataStore = (function() {
     return deferred.promise();
   };
 
+  var queryHeatmap = function(options) {
+    var deferred = $.Deferred();
+    options.fields = Fields.INCIDENT_LOCATION;
+    options.limit = 50000;
+    queryIncidents(options).done(function(data) {
+      deferred.resolve(data.filter(function(row) {
+        return (
+          // TODO: these specific sites might be filterable in the API
+          // e.g. incident_location.longitude != ...
+          // filter out city hall
+          !(row.incident_location.longitude == "-77.43364758299998" &&
+          row.incident_location.latitude == "37.54070234900007") &&
+          // filter out police HQ
+          !(row.incident_location.longitude == "-77.44491629499998" &&
+          row.incident_location.latitude == "37.546095328000035") &&
+          // TODO: see if there are other police stations, courthouses, etc.
+          // the very common 1300 Coalter Street address may be the sheriff's office, not sure
+          true
+        );
+      }));
+    });
+
+    return deferred.promise();
+  }
+
   return {
-    queryIncidents: queryIncidents
+    queryIncidents: queryIncidents,
+    queryHeatmap: queryHeatmap,
+    Fields: Fields
   };
 
 })();
