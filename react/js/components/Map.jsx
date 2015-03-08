@@ -1,8 +1,10 @@
 "use strict";
 
 var MapInfoWindow = require('./MapInfoWindow');
+var Logging = require('../mixins/Logging');
 
 var Map = React.createClass({
+  mixins: [Logging],
   // component lifecycle functions
   getInitialState: function() {
     return {
@@ -24,6 +26,7 @@ var Map = React.createClass({
   componentWillReceiveProps: function(nextProps) {
     // here we generate the Google Maps stuff based on the data
     if (this.shouldGenMarkers(nextProps)) {
+      this.log("Generating new markers");
       // clear existing markers
       this.setMarkerMap(null);
       // generate new markers
@@ -49,6 +52,7 @@ var Map = React.createClass({
       // add new markers to the state along with the fetch time so we can check if we need to update
       this.setState({ markers: markers, markerGenTime: nextProps.incidentFetchTime });
     } else if (this.shouldGenHeatmap(nextProps)) {
+      this.log("Generating new heatmap");
       // clear existing heatmap
       this.setHeatmapMap(null);
       var points = nextProps.heatmapPoints.map(function(row) {

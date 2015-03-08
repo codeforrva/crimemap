@@ -4,8 +4,10 @@ var ControlPanel = require('./ControlPanel');
 var Map = require('./Map');
 var AlertBox = require('./AlertBox');
 var IncidentDataStore = require('../IncidentDataStore');
+var Logging = require('../mixins/Logging');
 
 var App = React.createClass({
+  mixins: [Logging],
 
   getInitialState: function() {
     return {
