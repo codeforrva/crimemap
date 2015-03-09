@@ -1,13 +1,25 @@
 "use strict";
 
+var Alert = require('./mixins/Alert');
+var Logging = require('./mixins/Logging');
+
 var IncidentDataStore = (function() {
+
+  var showApiResponseAlert = function(response) {
+    if (response.responseJSON) {
+      Alert.sendAlert("And lo! The ground shook and a fell voice uttered fearsome words of great import: \"" + response.responseJSON.message + "\"");
+    } else {
+      Alert.sendAlert("Whoops! Looks like we broke the Internet. Sorry about that.");
+      Logging.error(response);
+    }
+  };
 
   var apiQuery = function(queryOpts) {
     var loading = $('#loading').show();
     return $.getJSON("https://brigades.opendatanetwork.com/resource/ush7-in5v.json?$$app_token=3sg2sPslVNC65HpUxDTSfRR4d&" +
-      $.param(queryOpts))/*.fail(function(response) {
+      $.param(queryOpts)).fail(function(response) {
         showApiResponseAlert(response);
-      }).always(loading.slideUp('fast'))*/;
+      })/*.always(loading.slideUp('fast'))*/;
   };
 
   var Fields = {
