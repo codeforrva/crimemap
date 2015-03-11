@@ -7,6 +7,7 @@ var ControlPanel = React.createClass({
     startDate: React.PropTypes.string.isRequired,
     endDate: React.PropTypes.string.isRequired,
     viewType: React.PropTypes.string.isRequired,
+    pointCount: React.PropTypes.number,
     onDateRangeChanged: React.PropTypes.func,
     onDateRangeUpdate: React.PropTypes.func,
     onViewTypeChanged: React.PropTypes.func
@@ -26,6 +27,7 @@ var ControlPanel = React.createClass({
     if (this.props.onViewTypeChanged) { this.props.onViewTypeChanged(choice); }
   },
   render: function() {
+    var pointCountMessage = this.props.pointCount !== undefined ? this.props.pointCount + " points displayed. " : undefined;
     return (
       <div id="sidebar" className="col-sm-3 col-sm-push-9 hidden-xs">
         <h4>Richmond Police Incident Data</h4>
@@ -63,6 +65,15 @@ var ControlPanel = React.createClass({
               </div>
             </form>
           </ControlSection>
+          <ControlSection id="About" title="About">
+            <p>This app shows police incidents in Richmond. It has events from January of 2004 through January of 2015.</p>
+            <p>Information comes from the Richmond Police Department's public data portal. The location is accurate to the block number, not the exact address.</p>
+            <p>This app was built by <a href="http://www.codeforrva.org/">Code for RVA</a>, a brigade of <a href="http://www.codeforamerica.org/">Code for America</a>.</p>
+            <p>Data is hosted by <a href="http://www.socrata.com/">Socrata</a> on the <a href="https://brigades.opendatanetwork.com/TRANSPARENCY/Richmond-Police-Incident-Data/ush7-in5v">Open Data Network</a>.</p>
+          </ControlSection>
+        </div>
+        <div className="pull-right">
+          {pointCountMessage}
         </div>
       </div>
     );

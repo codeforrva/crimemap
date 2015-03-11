@@ -44,12 +44,19 @@ var App = React.createClass({
   },
 
   render: function() {
+    var pointCount = undefined;
+    if (this.state.viewType == 'markers' && this.state.incidents) {
+      pointCount = this.state.incidents.length;
+    } else if (this.state.viewType == 'heatmap' && this.state.heatmapPoints) {
+      pointCount = this.state.heatmapPoints.length;
+    }
     return (
       <div id="container" className="container-fluid pull-right">
         <ControlPanel
           startDate={this.state.startDate}
           endDate={this.state.endDate}
           viewType={this.state.viewType}
+          pointCount={pointCount}
           onDateRangeChanged={this.dateRangeChanged}
           onDateRangeUpdate={this.dateRangeUpdate}
           onViewTypeChanged={this.viewTypeChanged}/>
