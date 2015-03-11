@@ -1,2 +1,3 @@
 node_modules
-js/bundle*js
+# commented out so we can deploy to GitHub as static files
+# js/bundle*js
