@@ -1,9 +1,0 @@
-html, body, #container { height: 100%; width: 100%; margin: 0; padding: 0; }
-
-#container {  }
-#map-canvas { height: 100%; }
-#sidebar { height: 100%; padding: 15px; }
-/* #topbar { background-color: green; position: absolute; z-index: 100; } */
-#alert-container { position: absolute; top: 0px; left: 0px; width: 100%; z-index: 100; padding: 15px; }
-
-a[data-toggle='collapse'] { text-decoration: none; }
