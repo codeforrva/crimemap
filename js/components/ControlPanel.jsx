@@ -55,6 +55,7 @@ var ControlPanel = React.createClass({
                     checked={this.props.viewType == 'markers' ? 'checked' : ''}/>&nbsp;
                   Markers
                 </label>
+                <br/>Show police incidents as markers on the map, which you can click for more info.
               </div>
               <div className="form-group">
                 <label>
@@ -62,6 +63,7 @@ var ControlPanel = React.createClass({
                   checked={this.props.viewType == 'heatmap' ? 'checked' : ''}/>&nbsp;
                   Heatmap
                 </label>
+                <br/>Show a heatmap view of police incidents, highlighting areas of more activity.
               </div>
             </form>
           </ControlSection>
