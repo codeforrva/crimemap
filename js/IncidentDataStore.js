@@ -78,11 +78,23 @@ var IncidentDataStore = (function() {
     });
 
     return deferred.promise();
-  }
+  };
+
+  var queryOffenseCodes = function() {
+    // $select=offense_code,offense_code_desc&$group=offense_code,offense_code_desc&$limit=50000&$order=offense_code
+    return apiQuery({
+      // get unique offense codes
+      "$select": "offense_code,offense_code_desc",
+      "$group": "offense_code,offense_code_desc",
+      "$limit": 50000,
+      "$order": "offense_code"
+    })
+  };
 
   return {
     queryIncidents: queryIncidents,
     queryHeatmap: queryHeatmap,
+    queryOffenseCodes: queryOffenseCodes,
     Fields: Fields
   };
 

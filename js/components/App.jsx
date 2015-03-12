@@ -20,6 +20,10 @@ var App = React.createClass({
 
   componentWillMount: function() {
     this.dateRangeUpdate();
+    // load offense codes
+    IncidentDataStore.queryOffenseCodes().done(function(data) {
+      this.setState({ offenseCodes: data });
+    }.bind(this));
   },
 
   dateRangeChanged: function(e) {
@@ -61,6 +65,7 @@ var App = React.createClass({
           endDate={this.state.endDate}
           viewType={this.state.viewType}
           pointCount={pointCount}
+          offenseCodes={this.state.offenseCodes}
           onDateRangeChanged={this.dateRangeChanged}
           onDateRangeUpdate={this.dateRangeUpdate}
           onViewTypeChanged={this.viewTypeChanged}/>
