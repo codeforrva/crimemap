@@ -12,10 +12,14 @@ var App = React.createClass({
   getInitialState: function() {
     return {
       startDate: "2015-01-01",
-      endDate: "2015-01-31",
+      endDate: "2015-01-05",
       incidentFetchTime: new Date(),
       viewType: 'markers'
-    }
+    };
+  },
+
+  componentWillMount: function() {
+    this.dateRangeUpdate();
   },
 
   dateRangeChanged: function(e) {
