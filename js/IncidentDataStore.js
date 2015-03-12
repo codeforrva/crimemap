@@ -30,7 +30,7 @@ var IncidentDataStore = (function() {
   var queryIncidents = function(options) {
 
     var startDate = options.startDate || '2015-01-01';
-    var endDate = options.endDate || '2015-01-31';
+    var endDate = options.endDate || '2015-01-05';
     var fields = options.fields || Fields.INCIDENT_BASIC_INFO;
     var limit = parseInt(options.limit) || 1000;
 
