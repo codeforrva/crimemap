@@ -1,6 +1,7 @@
 "use strict";
 
 var ControlSection = require('./ControlSection');
+var OffenseCodeList = require('./OffenseCodeList');
 
 var ControlPanel = React.createClass({
   propTypes: {
@@ -8,6 +9,7 @@ var ControlPanel = React.createClass({
     endDate: React.PropTypes.string.isRequired,
     viewType: React.PropTypes.string.isRequired,
     pointCount: React.PropTypes.number,
+    offenseCodes: React.PropTypes.array,
     onDateRangeChanged: React.PropTypes.func,
     onDateRangeUpdate: React.PropTypes.func,
     onViewTypeChanged: React.PropTypes.func
@@ -66,6 +68,9 @@ var ControlPanel = React.createClass({
                 <br/>Show a heatmap view of police incidents, highlighting areas of more activity.
               </div>
             </form>
+          </ControlSection>
+          <ControlSection id="OffenseCodes" title="Offense Codes" renderBody={false}>
+            <OffenseCodeList offenseCodes={this.props.offenseCodes}/>
           </ControlSection>
           <ControlSection id="About" title="About">
             <p>This app shows police incidents in Richmond. It has events from January of 2004 through January of 2015.</p>

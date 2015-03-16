@@ -25,3 +25,9 @@ a[data-toggle='collapse'] { text-decoration: none; }
 .alert-leave.alert-leave-active {
   opacity: 0.01;
 }
+
+table.offense-codes tbody {
+  display: block;
+  height: 200px;
+  overflow-y: scroll;
+}

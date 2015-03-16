@@ -23,7 +23,7 @@ var IncidentDataStore = (function() {
   };
 
   var Fields = {
-    INCIDENT_BASIC_INFO: "incident_location,offense_code_desc,incident_date_time,disposition_code_desc",
+    INCIDENT_BASIC_INFO: "incident_location,offense_code,offense_code_desc,incident_date_time,disposition_code_desc",
     INCIDENT_LOCATION: "incident_location"
   }
 
@@ -78,11 +78,23 @@ var IncidentDataStore = (function() {
     });
 
     return deferred.promise();
-  }
+  };
+
+  var queryOffenseCodes = function() {
+    // $select=offense_code,offense_code_desc&$group=offense_code,offense_code_desc&$limit=50000&$order=offense_code
+    return apiQuery({
+      // get unique offense codes
+      "$select": "offense_code,offense_code_desc",
+      "$group": "offense_code,offense_code_desc",
+      "$limit": 50000,
+      "$order": "offense_code"
+    })
+  };
 
   return {
     queryIncidents: queryIncidents,
     queryHeatmap: queryHeatmap,
+    queryOffenseCodes: queryOffenseCodes,
     Fields: Fields
   };
 
