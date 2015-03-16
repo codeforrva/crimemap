@@ -23,7 +23,7 @@ var IncidentDataStore = (function() {
   };
 
   var Fields = {
-    INCIDENT_BASIC_INFO: "incident_location,offense_code_desc,incident_date_time,disposition_code_desc",
+    INCIDENT_BASIC_INFO: "incident_location,offense_code,offense_code_desc,incident_date_time,disposition_code_desc",
     INCIDENT_LOCATION: "incident_location"
   }
 
