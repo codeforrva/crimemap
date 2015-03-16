@@ -63,7 +63,7 @@ var Map = React.createClass({
       });
       var heatmapLayer = new google.maps.visualization.HeatmapLayer({
             data: new google.maps.MVCArray(points),
-            radius: 15
+            radius: 30
           });
       this.setState({ heatmapLayer: heatmapLayer, heatmapGenTime: nextProps.incidentFetchTime });
     }
