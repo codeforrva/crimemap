@@ -31,3 +31,10 @@ table.offense-codes tbody {
   height: 200px;
   overflow-y: scroll;
 }
+.offense-code-row i {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  border-radius: 7px;
+}

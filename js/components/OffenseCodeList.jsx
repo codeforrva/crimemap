@@ -9,7 +9,16 @@ var OffenseCodeList = React.createClass({
 
   render: function() {
     var items = this.props.offenseCodes && this.props.offenseCodes.map(function (c) {
-      return (<tr key={c.offense_code + c.offense_code_desc}><td>{c.offense_code}</td><td>{c.offense_code_desc}</td></tr>);
+      var iconStyle = {
+        backgroundColor: c.color
+      };
+      return (
+        <tr className="offense-code-row" key={c.offense_code + c.offense_code_desc}>
+          <td><i style={iconStyle}/></td>
+          <td>{c.offense_code}</td>
+          <td>{c.offense_code_desc}</td>
+        </tr>
+      );
     });
     if (!items || items.length == 0) return null;
     return (
