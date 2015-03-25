@@ -11,10 +11,12 @@
     "reactify": "^1",
     "watchify": "^2",
     "envify": "^3",
-    "uglifyify": "^3"
+    "uglifyify": "^3",
+    "http-server": "*"
   },
   "scripts": {
-    "start": "watchify -t [reactify] -t [envify --NODE_ENV development] --extension=.jsx -o js/bundle.js -v -d js/main.jsx",
+    "server": "http-server",
+    "watch": "watchify -t [reactify] -t [envify --NODE_ENV development] --extension=.jsx -o js/bundle.js -v -d js/main.jsx",
     "build": "browserify -t [reactify] -t [envify --NODE_ENV development] --extension=.jsx -o js/bundle.js -d js/main.jsx",
     "dist": "browserify -t [reactify] -t [envify --NODE_ENV production] -t [uglifyify] --extension=.jsx -o js/bundle.min.js js/main.jsx"
   },
